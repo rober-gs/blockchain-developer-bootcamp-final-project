@@ -25,6 +25,8 @@ https://final-project-rober-gs.vercel.app/
   > ganache-cli 
 
   > truffle migrate
+  
+  > truffle test
 
   > npm start
 
