@@ -1,4 +1,11 @@
-# blockchain-developer-bootcamp-final-project
+# Final project | Decentralized Businesses
+
+### Prerequisites
+
+- Node.js >= v14
+- Truffle and Ganache
+- npm
+- `git checkout master`
 
 # Decentralized platform that provides online courses and certifications. 
 

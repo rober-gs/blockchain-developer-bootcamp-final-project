@@ -1,10 +1,8 @@
-import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Button} from 'antd';
 import { useCallback } from 'react';
 import { useAppContext } from '../AppContext';
 import { customFormat, evenIsDefined, toEthers } from '../utils/utilities';
-
+import { ethers } from "ethers";
 
 const useSeller = () => {
     
@@ -12,7 +10,6 @@ const useSeller = () => {
     const {
             dataContract,
             setDataContract,
-            transaction,
             setTransaction, 
             uiSetError,
      } = useAppContext();
@@ -22,40 +19,32 @@ const useSeller = () => {
         try{
             const DEFAULT_ADMIN_ROLE = await contract.DEFAULT_ADMIN_ROLE();
             const SELLER_ROLE = await contract.SELLER_ROLE();
-            const BUYER_ROLE = await contract.BUYER_ROLE();
-            const MEDIATOR_ROLE = await contract.MEDIATOR_ROLE();
-            
-            const roles = [
-                DEFAULT_ADMIN_ROLE, 
-                SELLER_ROLE,
-                BUYER_ROLE,
-                MEDIATOR_ROLE
-            ]
-            
-            setDataContract({
-                target:"roles",
-                data: {...roles}
-            });   
+            const VALIDATOR_ROLE = await contract.VALIDATOR_ROLE();
 
-            roles.map( i => {                                
-                contract.hasRole(i, account).then( assigned =>{                    
-                    if(assigned){
-                        //simula la funcionalidad de un CASE
-                        let roleIndex = {
-                            [DEFAULT_ADMIN_ROLE]:"ADMIN_ROLE", 
-                            [SELLER_ROLE]:"SELLER_ROLE",
-                            [BUYER_ROLE]:"BUYER_ROLE",
-                            [MEDIATOR_ROLE]:"MEDIATOR_ROLE" 
-                        }
-                        setDataContract({
-                            target:"roleAssigned",
-                            data: roleIndex[i],
-                        });
 
-                        return;
-                    } 
+            
+            let ADMIN = await contract.hasRole(DEFAULT_ADMIN_ROLE, account);   
+            let SELLER = await contract.hasRole(SELLER_ROLE, account);   
+
+            if(ADMIN){
+                setDataContract({
+                    target:"roleAssigned",
+                    data: "ADMIN_ROLE",
                 });
-            });
+
+                return;
+            } 
+            if(SELLER){
+
+                setDataContract({
+                    target:"roleAssigned",
+                    data: "SELLER_ROLE",
+                });
+
+                return;
+            } 
+            
+            
         } catch({ error }){
             uiSetError({
                 target:"errGetRoles",
@@ -78,24 +67,26 @@ const useSeller = () => {
     },[dataContract?.quote]);
 
     const registerSeller = useCallback(async( contract ) => {
-        console.log("registerSeller -->", account);
+    
         try {  
 
             contract.registerSeller({
                 from: account,
                 value: toEthers(dataContract.quote.toString()),  
                 gasLimit: 210000        
-            }).then( tx => {                
-                console.log("tx", tx);
-                console.log("txhash", tx.hash);
-                console.log("confirmations", tx.confirmations);
-               
-                setTransaction(tx);
+            }).then( hash => {         
 
-                tx.wait(2).then( result => {                    
-                    console.log("tx.wait.then( result =>", result);
-                    setTransaction( result );
-                    console.log(" setTransaction ", transaction);
+                setTransaction({
+                    target: "regSellerHash",
+                    data: hash
+                });
+
+                hash.wait(2).then( txHash => {                    
+                    console.log("tx.wait.then( result =>", txHash);
+                    setTransaction({
+                        target: "regSellerTxHash",
+                        data: txHash
+                    });
                 });
             });
             
@@ -103,9 +94,7 @@ const useSeller = () => {
             uiSetError({
                 target:"errRegisterSeller",
                 data: error?.message || error,
-            });            
-            console.error("Error ", error);   
-            
+            });               
         }
     },[]);
 
@@ -113,40 +102,93 @@ const useSeller = () => {
 
         try {            
 
-            const tx = await contract.unregisterSeller();
-            console.log("object", tx);
+            contract.unregisterSeller({
+                from: account,
+                gasLimit: 210000        
+            }).then( hash => {         
 
-            setTransaction({
-                ...transaction,
-                registerSeller:{
-                    ...tx
-                }
+                setTransaction({
+                    target: "unRegSellerHash",
+                    data: hash
+                });
+
+                hash.wait(2).then( txHash => {                    
+                    console.log("tx.wait.then( result =>", txHash);
+                    setTransaction({
+                        target: "unRegSellerTxHash",
+                        data: txHash
+                    });
+
+                    const findEvent = evenIsDefined(txHash?.logs)("LogRegisteredSeller");
+                    console.log("findEvent", findEvent);
+                });
             });
-            console.log("tx", tx, "transaction", transaction) ;
-
-            await tx.wait(2)
-            setTransaction({
-                ...transaction,
-                registerSeller:{
-                    ...tx
-                }
-            }); 
-            console.log("tx", tx, "transaction", transaction) ;
-
-
-
-            const findEvent = evenIsDefined(tx?.logs)("LogRegisteredSeller");
-            console.log("findEvent", findEvent);
             
         } catch ({error}) {
-            // setError( {
-            //     unRegisterSeller : error?.message 
-            // });
-            
+            uiSetError({
+                target:"errUnregisterSeller",
+                data: error?.message || error,
+            });            
+            console.error("Error ", error);
         } 
     },[]);
 
-    return {dataContract, checkRole, getQuote, registerSeller, unRegisterSeller}
+    const getProductList = useCallback( async( contract ) => {
+        try {
+            const totalBN =  await contract.productCount();
+            const total = ethers.BigNumber.from(totalBN).toNumber();
+
+            const items  = await Promise.all(
+                Array.from(Array(total)).map( (i, index) =>  index)       
+            );
+
+            const list = await Promise.all( items.map( i => contract.products(i) ));
+
+            setDataContract({
+                target: "productList",
+                data: list
+            });
+
+            localStorage.setItem("productList", JSON.stringify(list));
+            
+        } catch ({error}) {
+            console.log("Error ", error);
+        } 
+    },[]);
+
+    const addProduct = useCallback(async( contract, { name, description, price } ) => {
+
+        console.log("object", { name, description, price })
+
+            contract.addProduct(
+                name,
+                description,
+                toEthers(price).toString(),
+                { 
+                    from:account,
+                    gasLimit: 210000             
+                }
+            ).then( hash => {
+                hash.wait(2).then( txHash => {
+                    setDataContract({
+                        target:"addProductTxHash",
+                        data: txHash,
+                    })
+                });
+
+            });
+            
+            try {            
+
+            
+        } catch ({error}) {
+                   
+            console.error("Error ", error);
+        } 
+    },[]);
+
+
+    return {dataContract, checkRole, getQuote, registerSeller, unRegisterSeller, getProductList, addProduct}
 }
 
 export default useSeller

@@ -1,12 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-
-import { Dashboard } from './layouts/Dashboard';
-
+import React from "react";
+import ReactDOM from "react-dom";
+import { MainApp } from "./MainApp";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Dashboard />
-  </React.StrictMode>,
-  document.getElementById("root")
+    <React.StrictMode>
+        <MainApp />
+    </React.StrictMode>,
+    
+    document.getElementById("root")
 );
+
