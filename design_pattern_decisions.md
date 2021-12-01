@@ -7,4 +7,4 @@
 
 ## Inheritance and Interfaces
 
-- `DecentralizedBusinesses.sol` inherited from `Base.sol` 
+- `DecentralizedBusinesses.sol` inherited from `AccessControl.sol` 
