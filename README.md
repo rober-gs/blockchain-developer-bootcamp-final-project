@@ -1,16 +1,16 @@
 # Final project | Decentralized Businesses
 
 
-## Wallet for certification:
+## My Wallet for certification:
 `0x785a8a05560869b3fb4A8D8fF649A5EB819fCab9`
 
 ## Screencast 
 
-https://youtu.be/
+https://youtu.be/EIwF1hp5A_M
 
 ## Url Project 
 
-https://final-project-5kqvo6zsp-rober-gs.vercel.app
+https://final-project-rober-gs.vercel.app/
 
 ## Prerequisites
 
@@ -29,6 +29,13 @@ https://final-project-5kqvo6zsp-rober-gs.vercel.app
   > npm start
 
 - Make sure your Metamask localhost network is in port `8545`.
+
+## Directory structure
+
+- `contracts`: truffle project --> Smart contracts folder.
+- `migrations`: truffle project --> Migration files for deploying contracts.
+- `test`: truffle project --> Tests for smart contracts.
+- `src` and `public`: Project's React frontend.
 
 ## About  Project
 It is intended to be a standard or development layer for buying and selling projects applicable to any business model.
