@@ -20,8 +20,9 @@ const initialContext = {
         regSellerHash: null,
         regSellerTxHash: null,
         unRegSellerHash: null,
+        unRegSellerTxHash: null,
         addProductTxHash: null,
-        unRegSellerTxHash: null
+        buyProductTxHash: null,
     },
 };
 

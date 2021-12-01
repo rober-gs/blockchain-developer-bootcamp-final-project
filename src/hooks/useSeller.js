@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import { useCallback } from 'react';
 import { useAppContext } from '../AppContext';
-import { customFormat, evenIsDefined, toEthers } from '../utils/utilities';
+import { customFormat, toEthers } from '../utils/utilities';
 import { ethers } from "ethers";
 
 const useSeller = () => {
@@ -100,7 +100,7 @@ const useSeller = () => {
 
     const unRegisterSeller = useCallback(async( contract ) => {
 
-        try {            
+        // try {            
 
             contract.unregisterSeller({
                 from: account,
@@ -118,19 +118,16 @@ const useSeller = () => {
                         target: "unRegSellerTxHash",
                         data: txHash
                     });
-
-                    const findEvent = evenIsDefined(txHash?.logs)("LogRegisteredSeller");
-                    console.log("findEvent", findEvent);
                 });
             });
             
-        } catch ({error}) {
-            uiSetError({
-                target:"errUnregisterSeller",
-                data: error?.message || error,
-            });            
-            console.error("Error ", error);
-        } 
+        // } catch ({error}) {
+        //     uiSetError({
+        //         target:"errUnregisterSeller",
+        //         data: error?.message || error,
+        //     });            
+        //     console.error("Error ", error);
+        // } 
     },[]);
 
     const getProductList = useCallback( async( contract ) => {
@@ -186,9 +183,39 @@ const useSeller = () => {
             console.error("Error ", error);
         } 
     },[]);
+    
+    const buyProduct = useCallback(async( contract, { id, price } ) => {
+
+        console.log("buyProduct", { id, price });
+
+            contract.buyProduct(
+                id,
+                { 
+                    from:account,
+                    value: price,
+                    gasLimit: 210000             
+                }
+            ).then( hash => {
+                hash.wait(2).then( txHash => {
+                    setDataContract({
+                        target:"buyProductTxHash",
+                        data: txHash,
+                    })
+                });
+
+            });
+            
+            try {            
+
+            
+        } catch ({error}) {
+                   
+            console.error("Error ", error);
+        } 
+    },[]);
 
 
-    return {dataContract, checkRole, getQuote, registerSeller, unRegisterSeller, getProductList, addProduct}
+    return {dataContract, checkRole, getQuote, registerSeller, unRegisterSeller, getProductList, addProduct, buyProduct}
 }
 
 export default useSeller

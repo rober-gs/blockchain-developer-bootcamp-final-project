@@ -71,9 +71,10 @@ export const FormBuyer = () => {
                   <Input prefix={<DollarOutlined />} style={{ width: '100%' }} />
                 </Form.Item>                        
                 <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary" htmlType="submit" loading={loading}>
                         Submit
                     </Button>
+                   
                 </Form.Item>
             </Form>
      

@@ -28,7 +28,7 @@ https://final-project-5kqvo6zsp-rober-gs.vercel.app
 
   > npm start
 
-
+- Make sure your Metamask localhost network is in port `8545`.
 
 ## About  Project
 It is intended to be a standard or development layer for buying and selling projects applicable to any business model.

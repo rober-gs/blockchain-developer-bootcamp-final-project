@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Divider, PageHeader, Row } from "antd";
 import { ProductItem } from "./ProductItem";
 import { ProductItemSkeleton } from "./ProductItemSkeleton";
+import { Buy } from "../../components/Modals/Buy";
 
 export const ProductList = ( ) => {
 
@@ -14,7 +15,7 @@ export const ProductList = ( ) => {
     const getItem  = () => {
         setProductList( JSON.parse( localStorage.getItem("productList") || null  ))
     }
-
+    
     return (
         <>              
             <PageHeader
@@ -26,7 +27,7 @@ export const ProductList = ( ) => {
             <Row>
                 {
                     (productList && productList.length > 0 )
-                    ? productList?.map( (i, index) => <ProductItem key={index}  item={i}/>  )
+                    ? productList?.map( (i, index) => <ProductItem key={index}  item={i} />  )
                     : [1,2,3,4,5,6].map( prod => <ProductItemSkeleton key={prod} /> )
                 }
             </Row>

@@ -83,7 +83,71 @@ contract("DecentralizedBusinesses",  accounts => {
         });
 
     });
+    describe(" Product ", () => {
 
+        it("Should change the product count",  async() => {
+
+            await instance.setQuote(1);
+            await instance.registerSeller( { from: accounts[4], value: web3.utils.toWei("1", 'ether')  } )
+            
+            
+            const count = await instance.productCount();
+            await instance.addProduct("Tv", "smart", web3.utils.toWei("1", "ether"), { from: accounts[4] });
+            const countNow = await instance.productCount();
+
+    
+
+            assert.equal(
+                web3.utils.BN(count).toNumber()+ 1,
+                web3.utils.BN(countNow).toNumber(),
+                "No se agrego su producto correctamente "
+            );
+
+        });
+        it(" Should be the same properties del producto",  async() => {
+
+            const name = "Consensys";
+            const description = "Developer Bootcamp";
+            const price = web3.utils.toWei("4", "ether");
+
+            await instance.setQuote(1);
+            await instance.registerSeller( { from: accounts[5], value: web3.utils.toWei("1", 'ether')  } )
+           
+
+            await instance.addProduct(name, description, price, { from: accounts[5] });
+            const count = await instance.productCount();
+            const prod = await instance.products(web3.utils.BN(count).toNumber() -1 );
+           
+            assert.equal(
+                name,
+                prod.name,
+                "El name no corresponde"
+            );
+            
+            assert.equal(
+                description,
+                prod.description,
+                "La descripcion no corresponde"
+            ) 
+            assert.equal(
+                accounts[5],
+                prod.seller,
+                "el seller no corresponde"
+            ) 
+            assert.equal(
+                "0x0000000000000000000000000000000000000000",
+                prod.buyer,
+                "el buyer no corresponde"
+            ) 
+            assert.equal(
+                0,
+                web3.utils.BN(prod.state).toNumber(),
+                "el state no corresponde"
+            ) 
+           
+        });
+
+    });
 
 
 

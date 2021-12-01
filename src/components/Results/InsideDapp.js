@@ -20,60 +20,77 @@ export const InsideDapp = ( role ) => {
 
     const { roleAssigned, unRegSellerTxHash } = dataContract;
 
-    const [Loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
    
 
 
     const onClick = () => {
 
         setLoading(true);
+
         unRegisterSeller(contract).then(
             setLoading(false)
         );
-        getProductList(contract);
+        // getProductList(contract);
 
         
     }
 
+    // const Result = () => {
+
+    //     if( unRegSellerTxHash )
+    //     {
+    //         return (
+                
+
+                
+    //         )
+    //     }
+            
+    // }
+
     return (
-       
+           <>
+                {
+                ( !loading )
+                    ? 
+                        ( unRegSellerTxHash  ) 
+                            ?   <Result
+                                    status={"success" }
+                                    title={ "Successfully Register!" } 
+                                    subTitle={ JSON.stringify(unRegSellerTxHash, "", 2 )}                        
+                                    extra={[
+                                        <Button 
+                                            type="primary" 
+                                            key="check" 
+                                            onClick={ ()=> window.open(`https://rinkeby.etherscan.io/tx/${unRegSellerTxHash.hash}`, "_blank") }>
+                                            Check transaction
+                                        </Button>
+                                    ]}
+                                 />
 
-            (unRegSellerTxHash)
-            ?    <Result
-                    status={"success" }
-                    title={ "Successfully Register!" } 
-                    subTitle={ JSON.stringify(unRegSellerTxHash, "", 2 )}                        
-                    extra={[
-                        <Button 
-                            type="primary" 
-                            key="check" 
-                            onClick={ ()=> window.open(`https://rinkeby.etherscan.io/tx/${unRegSellerTxHash.hash}`, "_blank") }>
-                            Check transaction
-                        </Button>
-                    ]}
-                />
-            : 
-                <Spin spinning={Loading}>
-                    <Result
-                            key="Great"
-                            icon={<SmileOutlined />}
-                            title="Great, you are inside!"   
-                            subTitle="You are:"                       
-                            extra={[
-                                <Badge.Ribbon text={ roleAssigned } color="blue">
-                                    <Card size="small">
-                                        { account }
-                                    </Card>
-                                </Badge.Ribbon>,
-                                <br />,
-                                <Button href="/home" type="primary">
-                                    Go Home &gt;
-                                </Button>,
-                                (roleAssigned === "SELLER_ROLE") ? <Button danger onClick={ ()=> { onClick() }}> unregister </Button> : null
+                            : <Result
+                                key="Great"
+                                icon={<SmileOutlined />}
+                                title="Great, you are inside!"   
+                                subTitle="You are:"                       
+                                extra={[
+                                    <Badge.Ribbon text={ roleAssigned } color="blue">
+                                        <Card size="small">
+                                            { account }
+                                        </Card>
+                                    </Badge.Ribbon>,
+                                    <br />,
+                                    <Button href="/home" type="primary">
+                                        Go Home &gt;
+                                    </Button>,
+                                    (roleAssigned === "SELLER_ROLE") ? <Button danger onClick={ ()=> { onClick() }}> unregister </Button> : null
 
-                            ]}
-                    />
-                </Spin>
+                                ]}
+                            />
+                    : <Spin size="large" />
+                }
+           </>        
              
     
     )
