@@ -39,7 +39,7 @@ export const FormBuyer = () => {
                   <Button 
                       type="primary" 
                       key="check" 
-                      onClick={ ()=> window.open(`https://rinkeby.etherscan.io/tx/${addProductTxHash.hash}`, "_blank") }>
+                      onClick={ ()=> window.open(`https://rinkeby.etherscan.io/tx/${addProductTxHash.transactionHash}`, "_blank") }>
                       Check transaction
                   </Button>
               ]}
